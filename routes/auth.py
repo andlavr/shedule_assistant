@@ -15,7 +15,7 @@ router = APIRouter(tags=['auth'])
 async def create_session(username: str = Form(...), password: str = Form(...)):
     if not username == USER_NAME:
         raise HTTPException(401, "Username not found")
-    if not bcrypt.checkpw(password.encode(), PERSONAL_PASSWORD.encode()):
+    if PERSONAL_PASSWORD != password:
         raise HTTPException(401, "Password incorrect")
 
     random_session_id = str(uuid4())

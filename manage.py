@@ -50,6 +50,11 @@ async def index(request: Request):
         return templates.TemplateResponse("login.html", {"request": request})
 
 
+@app.get("/docs")
+async def docs():
+    return {"no": "docs"}
+
+
 if __name__ == "__main__":
     import uvicorn
 
