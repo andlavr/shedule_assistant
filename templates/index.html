@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="CodeHim">
+    <title> BS5 FullCalendar Example </title>
+    <!-- Style CSS -->
+    <link href="{{ url_for('static', path='/css/index.css')}}" rel='stylesheet'>
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css' rel='stylesheet'>
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css' rel='stylesheet'>
+</head>
+<body>
+<header class="text-center">
+    <h1>Планировщик</h1>
+</header>
+
+<div class="m-5">
+    <div class="box">
+        <div id="sidebar">
+
+            <h5 class="mb-3 text-center">Следующие 5 событий:</h5>
+            {% for event in events %}
+
+            <div class="card mt-2">
+                <div class="card-header">
+                    <b>{{event.title}}</b>
+                </div>
+                <div class="card-body">
+                    <p class="card-text"><b>Начало:</b> {{event.start.strftime('%Y-%m-%d')}}</p>
+                    <p class="card-text"><b>Конец:</b> {{event.end.strftime('%Y-%m-%d')}}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div id="content">
+            <div id='calendar'></div>
+        </div>
+    </div>
+
+    <div class="modal fade edit-form" id="add-event-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title" id="modal-title">Добавить событие</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form id="add-event-modal-form">
+                    <div class="modal-body">
+                        <div class="alert alert-danger " role="alert" id="danger-alert" style="display: none;">
+                            End date should be greater than start date.
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="event-title">Название события <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="event-title"
+                                   placeholder="Введите название события"
+                                   required>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="event-description">Описание события <small
+                                    class="text-muted">Optional</small></label>
+                            <textarea class="form-control" id="event-description" rows="3"
+                                      placeholder="Введите описание события"></textarea>
+                        </div>
+
+
+                        <div class="form-group mt-3">
+                            <label for="event-title">Категория <span class="text-danger">*</span></label>
+
+                            <select class="form-select" aria-label="Category select" id="event-category">
+                                {% for event_category in event_categories %}
+                                <option value="{{event_category}}">{{event_category}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="event-priority">Приоритет <span class="text-danger">*</span></label>
+                            <select class="form-select" aria-label="Priority select" id="event-priority">
+                                <option value="low">Низкий</option>
+                                <option value="medium">Средний</option>
+                                <option value="high">Высокий</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="event-start-date">Начало события <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="event-start-date"
+                                   placeholder="start-date" required>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="event-end-date">Конец события <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="event-end-date"
+                                   placeholder="end-date">
+                        </div>
+
+                        <div class="form-check form-switch mt-3">
+                            <input class="form-check-input" type="checkbox" id="event-repeatable">
+                            <label class="form-check-label" for="event-repeatable">Повторяемое <small
+                                    class="text-muted">Optional</small></label>
+                        </div>
+
+                        <div class="form-group mt-3" id="repeat-event-group" style="display: none;">
+                            <label for="event-repeat-interval">Интервал повторения <span
+                                    class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="event-repeat-interval"
+                                       style="max-width: 150px"
+                                       required>
+                                <select class="form-select" aria-label="Repeat select" id="event-repeat-unit">
+                                    <option value="hours">Час</option>
+                                    <option value="days">День</option>
+                                    <option value="weeks">Неделя</option>
+                                    <option value="months">Месяц</option>
+                                    <option value="years">Год</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="event-end-date">Повторять до <span class="text-danger">*</span></label>
+                                <input type="datetime-local" class="form-control" id="event-until-date"
+                                       placeholder="until-date">
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group mt-3">
+                            <label for="event-color">Цвет</label>
+                            <input type="color" class="form-control" id="event-color" value="#3788d8">
+                        </div>
+
+                    </div>
+                    <div class="modal-footer border-top-0 d-flex justify-content-center">
+                        <button type="submit" class="btn btn-success" id="submit-button">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-event-info" tabindex="-1" role="dialog" aria-labelledby="modal-event-info-title"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-event-info-title">Информация о событии</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center" id="modal-event-info-body">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="event-info-title">Название события</span>
+                        <input type="text" class="form-control" id="event-info-title-value"
+                               aria-describedby="basic-addon3">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text">Описание события</span>
+                        <textarea class="form-control" id="event-info-description-value" aria-label="With textarea"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js"></script>
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
+
+<script src="{{ url_for('static', path='/js/index.js')}}"></script>
+
+</body>
+</html>
