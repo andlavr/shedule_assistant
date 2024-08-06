@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 import uuid
+from typing import List, Optional
 
 from dateutil.relativedelta import relativedelta
 from fastapi import HTTPException
@@ -12,7 +13,11 @@ from conf import ROOT_DIR
 from schemas.event import Event
 
 
-def get_all_events():
+def get_all_events() -> List[Event]:
+    """
+    Получает список ивентов
+    :return: список
+    """
     if not os.path.exists(os.path.join(ROOT_DIR, 'events')):
         raise HTTPException(status_code=404, detail="Events no found")
 
@@ -25,7 +30,13 @@ def get_all_events():
     return events
 
 
-def add_event(event: Event):
+def add_event(event: Event) -> Optional[str]:
+    """
+    Добавляет ивен
+    :param event: объект типа ивент в формате строки
+
+    :return: None
+    """
     if not event.extendedProps.repeatable:
         serialize_event(event)
         return JSONResponse(status_code=status.HTTP_201_CREATED, content={"success": "event created"})
@@ -42,7 +53,13 @@ def add_event(event: Event):
         serialize_event(event)
 
 
-def delete_events_by_parent(parent_id):
+def delete_events_by_parent(parent_id) -> bool:
+    """
+    Удаляет ивенты по родительскому id
+    :param parent_id: объект типа id формат int
+
+    :return: bool
+    """
     if not os.path.exists(os.path.join(ROOT_DIR, 'events')):
         raise HTTPException(status_code=404, detail="Events no found")
 
@@ -51,7 +68,13 @@ def delete_events_by_parent(parent_id):
     return True
 
 
-def delete_event_by_id(event_id):
+def delete_event_by_id(event_id) -> bool:
+    """
+    Удалляет выбранный по id ивент
+    :param event_id: объект типа id формат int
+
+    :return: bool
+    """
     print(event_id)
     if not os.path.exists(os.path.join(ROOT_DIR, 'events')):
         raise HTTPException(status_code=404, detail="Events folder no found")
@@ -67,7 +90,13 @@ def delete_event_by_id(event_id):
     raise HTTPException(status_code=404, detail="Event no found")
 
 
-def serialize_event(event: Event):
+def serialize_event(event: Event) -> None:
+    """
+    Сериализует ивент
+    :param event: обект типа ивент
+
+    :return: None
+    """
     file_path = os.path.join(ROOT_DIR, 'events', str(event.extendedProps.parentID), f'{str(event.id)}.json')
 
     if not os.path.exists(os.path.dirname(file_path)):
@@ -79,7 +108,13 @@ def serialize_event(event: Event):
         f.write(event_json)
 
 
-def deserialize_event(file_path):
+def deserialize_event(file_path):  # что тут указать????
+    """
+    Десириализует ивент
+    :param file_path: параменты относительного пути
+
+    :return: ивент
+    """
     with open(file_path, "r") as f:
         data = json.load(f)
 

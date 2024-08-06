@@ -57,20 +57,7 @@ if __name__ == '__main__':
     with open(str(event.id), "r") as f:
         data = json.load(f)
 
-    # print(type(event_json), event_json)
-    #
-    # data = json.loads(event_json)
-    # print(type(data), data)
 
     event_from_dict = Event(**data)
     print(type(event_from_dict), event_from_dict)
 
-    # e = json.dumps(event.model_dump_json())
-    # Event.model_validate(from_json(e))
-    # print(type(e))
-    # d = json.loads(e)
-
-    # ev = Event().
-    # print(ev)
-
-    # print(event.json(indent=4))

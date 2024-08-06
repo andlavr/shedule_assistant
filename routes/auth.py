@@ -13,6 +13,12 @@ router = APIRouter(tags=['auth'])
 
 @router.post("/login")
 async def create_session(username: str = Form(...), password: str = Form(...)):
+    """
+    Проверяет логин и пароль
+    :param username: str
+    :param password: str
+    :return:
+    """
     if not username == USER_NAME:
         raise HTTPException(401, "Username not found")
     if PERSONAL_PASSWORD != password:

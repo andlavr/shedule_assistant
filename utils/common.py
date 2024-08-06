@@ -7,8 +7,14 @@ def check_types(obj, datatype):
 
 
 def load_categories(file_path):
+    """
+    Загружает категории
+    :param file_path:
+    :return: list
+    """
     with open(file_path, "rb") as file:
-        return pickle.load(file)
+        data = pickle.load(file)
+        return data
 
 
 def save_categories(file_path, categories):
